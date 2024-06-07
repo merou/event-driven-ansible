@@ -34,7 +34,7 @@ tasks:
   build-eda:
     desc: "Build eda docker image"
     internal: false
-    deps: [virtualenv,build-minimal-decision-environment]
+    deps: [build-minimal-decision-environment]
     dir: './src'
     cmds:
       - |
@@ -44,7 +44,7 @@ tasks:
   run-eda:
     desc: "Run eda!"
     internal: false
-    deps: [virtualenv,build-minimal-decision-environment,build-eda]
+    deps: [build-eda]
     dir: './src'
     cmds:
       - |
