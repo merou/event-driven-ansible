@@ -1,0 +1,51 @@
+---
+
+version: "3"
+
+silent: false
+
+env:
+  PYTHON_VERSION: 3.11
+  EDA_DOCKER_IMAGE: 'eda:latest'
+
+tasks:
+  virtualenv:
+    desc: "Create virtual environment"
+    dir: './src'
+    cmds:
+      - python{{.PYTHON_VERSION}} -m venv .venv
+      - |
+        source .venv/bin/activate
+        pip install -U pip
+        pip install ansible-builder==3.0.0
+    status:
+      - test -d .venv
+
+  build-minimal-decision-environment:
+    desc: "Build minimal decision environment docker image"
+    internal: false
+    deps: [virtualenv]
+    dir: './src/minimal-decision-environment/'
+    cmds:
+      - |
+        source ../.venv/bin/activate
+        ansible-builder build --tag minimal-decision-environment:latest --context . -f execution-environment.yml --container-runtime docker -v 3
+
+  build-eda:
+    desc: "Build eda docker image"
+    internal: false
+    deps: [virtualenv,build-minimal-decision-environment]
+    dir: './src'
+    cmds:
+      - |
+        source .venv/bin/activate
+        ansible-builder build --tag {{.EDA_DOCKER_IMAGE}} --context . -f execution-environment.yml --container-runtime docker -v 3
+
+  run-eda:
+    desc: "Run eda!"
+    internal: false
+    deps: [virtualenv,build-minimal-decision-environment,build-eda]
+    dir: './src'
+    cmds:
+      - |
+        docker run --rm -p 8080:8080 {{.EDA_DOCKER_IMAGE}} 

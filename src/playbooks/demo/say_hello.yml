@@ -1,0 +1,13 @@
+---
+
+- name: "Stupid demo just saying hello"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+
+  tasks:
+
+    - name: "Say hello"
+      ansible.builtin.debug:
+        msg: "Hello {{ ansible_eda.event.payload.name }}!"

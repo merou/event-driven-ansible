@@ -1,0 +1,5 @@
+# EDA
+_build/
+context/
+Dockerfile
+.venv/
